@@ -4,7 +4,7 @@ import sys
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-static_libraries   = ['aplib64']
+static_libraries   = []
 static_lib_dir     = 'lib'
 libraries          = []
 library_dirs       = ['lib']

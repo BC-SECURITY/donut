@@ -83,7 +83,6 @@
 #include "hash.h"        // api hashing
 #include "encrypt.h"     // symmetric encryption of instance+module
 #include "format.h"      // output format for loader
-#include "aplib.h"       // aPLib compression for both windows + linux
 
 #ifndef MAX_PATH
  #define MAX_PATH 260
@@ -161,7 +160,6 @@ typedef struct _GUID {
 
 // compression engine
 #define DONUT_COMPRESS_NONE              1
-#define DONUT_COMPRESS_APLIB             2
 #define DONUT_COMPRESS_LZNT1             3  // COMPRESSION_FORMAT_LZNT1
 #define DONUT_COMPRESS_XPRESS            4  // COMPRESSION_FORMAT_XPRESS
 
