@@ -1,5 +1,6 @@
 from setuptools import Extension, setup
 import sys
+import platform
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -19,16 +20,24 @@ sources            = ['donut.c',
                       'loader/clib.c', 
                       'donutmodule.c']
 
-if sys.platform == 'win32':
+if sys.platform == 'darwin' or sys.platform.startswith('linux'):
+    arch = platform.machine()
+    if arch == 'x86_64':
+        extra_compile_args += ["-D", "MAX_PATH=260"]
+    elif arch == 'arm64':
+        extra_compile_args += ["-D", "MAX_PATH=260"]
+elif sys.platform == 'win32':
     libraries.extend(static_libraries)
     library_dirs.append(static_lib_dir)
     extra_objects = []
 elif sys.platform == 'win64':
     libraries.extend(static_libraries)
     library_dirs.append(static_lib_dir)
-    extra_objects = []    
+    extra_objects = []
+    extra_objects = []
 else: # POSIX
     extra_objects = ['{}/{}.a'.format(static_lib_dir, l) for l in static_libraries]
+
 
 
 module = Extension(
