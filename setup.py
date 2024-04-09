@@ -27,16 +27,12 @@ if sys.platform == 'darwin' or sys.platform.startswith('linux'):
     elif arch == 'arm64':
         extra_compile_args += ["-D", "MAX_PATH=260"]
 elif sys.platform == 'win32':
-    libraries.extend(static_libraries)
     library_dirs.append(static_lib_dir)
     extra_objects = []
 elif sys.platform == 'win64':
-    libraries.extend(static_libraries)
     library_dirs.append(static_lib_dir)
     extra_objects = []
     extra_objects = []
-else: # POSIX
-    extra_objects = ['{}/{}.a'.format(static_lib_dir, l) for l in static_libraries]
 
 
 
@@ -53,7 +49,7 @@ module = Extension(
 
 setup(
      name='donut-shellcode',
-     version='1.0.2',
+     version='1.0.3',
      description='Donut shellcode Python C extension',
      long_description=long_description,
      long_description_content_type="text/markdown",
