@@ -1357,10 +1357,10 @@ static int validate_loader_cfg(PDONUT_CONFIG c) {
         return DONUT_ERROR_INVALID_ENGINE;
       }
     #else
-      if(c->compress != DONUT_COMPRESS_NONE
+      if(c->compress != DONUT_COMPRESS_NONE)
       {
-        DPRINT("Compression engine %" PRId32 " is invalid.", c->compress);
-        return DONUT_ERROR_INVALID_ENGINE;
+       DPRINT("Compression engine %" PRId32 " is invalid.", c->compress);
+       return DONUT_ERROR_INVALID_ENGINE;
       }
     #endif
   
