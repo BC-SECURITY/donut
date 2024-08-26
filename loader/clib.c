@@ -36,65 +36,70 @@
 
 // funnily enough, MSVC still tries to replace this
 // with memset hence the use of assembly..
-void *Memset (void *ptr, int value, uint32_t num) {
+void *Memset(void *ptr, int value, uint32_t num) {
 
-    #ifdef _MSC_VER
+#ifdef _MSC_VER
     __stosb(ptr, value, num);
-    #else
-    unsigned char *p = (unsigned char*)ptr;
-    
-    while(num--) {
-      *p = (unsigned char)value;
-      p++;
+#else
+    unsigned char *p = (unsigned char *)ptr;
+
+    while (num--) {
+        *p = (unsigned char)value;
+        p++;
     }
-    #endif
+#endif
     return ptr;
 }
 
-void *Memcpy (void *destination, const void *source, uint32_t num) {
-    unsigned char *out = (unsigned char*)destination;
-    unsigned char *in  = (unsigned char*)source;
-    
-    while(num--) {
-      *out = *in;
-      out++; in++;
+void *Memcpy(void *destination, const void *source, uint32_t num) {
+    unsigned char *out = (unsigned char *)destination;
+    unsigned char *in = (unsigned char *)source;
+
+    while (num--) {
+        *out = *in;
+        out++;
+        in++;
     }
     return destination;
 }
 
 int Memcmp(const void *ptr1, const void *ptr2, uint32_t num) {
-    register const unsigned char *s1 = (const unsigned char*)ptr1;
-    register const unsigned char *s2 = (const unsigned char*)ptr2;
+    register const unsigned char *s1 = (const unsigned char *)ptr1;
+    register const unsigned char *s2 = (const unsigned char *)ptr2;
 
     while (num-- > 0) {
-      if (*s1++ != *s2++)
-        return s1[-1] < s2[-1] ? -1 : 1;
+        if (*s1++ != *s2++)
+            return s1[-1] < s2[-1] ? -1 : 1;
     }
     return 0;
 }
 
 int compare(const char *s1, const char *s2) {
-    while(*s1 && *s2) {
-      if(*s1 != *s2) {
-        return 0;
-      }
-      s1++; s2++;
+    while (*s1 && *s2) {
+        if (*s1 != *s2) {
+            return 0;
+        }
+        s1++;
+        s2++;
     }
     return *s2 == 0;
 }
 
-const char* _strstr(const char *s1, const char *s2) {
+const char *_strstr(const char *s1, const char *s2) {
     while (*s1) {
-      if((*s1 == *s2) && compare(s1, s2)) return s1;
-      s1++;
+        if ((*s1 == *s2) && compare(s1, s2))
+            return s1;
+        s1++;
     }
     return NULL;
 }
 
 int _strcmp(const char *str1, const char *str2) {
     while (*str1 && *str2) {
-      if(*str1 != *str2) break;
-      str1++; str2++;
+        if (*str1 != *str2)
+            break;
+        str1++;
+        str2++;
     }
     return (int)*str1 - (int)*str2;
 }
@@ -105,15 +110,17 @@ int _strcmp(const char *str1, const char *str2) {
 
     A suggestion was made by dismantl: https://github.com/S4ntiagoP/donut/pull/2/files
 
-    This suggestion was integrated. Git did not allow merging their PR into the source repo.
-    So I am crediting them via comment instead.
+    This suggestion was integrated. Git did not allow merging their PR into the source
+   repo. So I am crediting them via comment instead.
 
 */
 
 int stricmp(const char *str1, const char *str2) {
     while (*str1 && *str2) {
-      if ((*str1 | 0x20) != (*str2 | 0x20)) break;
-      str1++; str2++;
+        if ((*str1 | 0x20) != (*str2 | 0x20))
+            break;
+        str1++;
+        str2++;
     }
     return (int)*str1 - (int)*str2;
 }

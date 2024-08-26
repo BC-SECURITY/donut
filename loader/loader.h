@@ -38,12 +38,12 @@
 #include <inttypes.h>
 #endif
 
-#include <windows.h>
-#include <wincrypt.h>
-#include <oleauto.h>
 #include <objbase.h>
-#include <wininet.h>
+#include <oleauto.h>
 #include <shlwapi.h>
+#include <wincrypt.h>
+#include <windows.h>
+#include <wininet.h>
 
 #pragma comment(lib, "wininet.lib")
 #pragma comment(lib, "advapi32.lib")
@@ -58,27 +58,30 @@
 
 #define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 
- #define DPRINT(...) { \
-   fprintf(stderr, "\nDEBUG: %s:%d:%s(): ", __FILENAME__, __LINE__, __FUNCTION__); \
-   fprintf(stderr, __VA_ARGS__); \
- }
+#define DPRINT(...)                                                                      \
+    {                                                                                    \
+        fprintf(stderr, "\nDEBUG: %s:%d:%s(): ", __FILENAME__, __LINE__, __FUNCTION__);  \
+        fprintf(stderr, __VA_ARGS__);                                                    \
+    }
 #else
- #define DPRINT(...) // Don't do anything in release builds
+#define DPRINT(...) // Don't do anything in release builds
 #endif
 
-#define STATIC_KEY ((__TIME__[7] - '0') * 1    + (__TIME__[6] - '0') * 10  + \
-                    (__TIME__[4] - '0') * 60   + (__TIME__[3] - '0') * 600 + \
-                    (__TIME__[1] - '0') * 3600 + (__TIME__[0] - '0') * 36000)
+#define STATIC_KEY                                                                       \
+    ((__TIME__[7] - '0') * 1 + (__TIME__[6] - '0') * 10 + (__TIME__[4] - '0') * 60       \
+     + (__TIME__[3] - '0') * 600 + (__TIME__[1] - '0') * 3600                            \
+     + (__TIME__[0] - '0') * 36000)
 
 // Relative Virtual Address to Virtual Address
-#define RVA2VA(type, base, rva) (type)((ULONG_PTR) base + rva)
+#define RVA2VA(type, base, rva) (type)((ULONG_PTR)base + rva)
 
 #if defined(_M_IX86) || defined(__i386__)
 // return pointer to code in memory
 char *get_pc(void);
 
-// PC-relative addressing for x86 code. Similar to RVA2VA except using functions in payload
-#define ADR(type, addr) (type)(get_pc() - ((ULONG_PTR)&get_pc - (ULONG_PTR)addr))
+// PC-relative addressing for x86 code. Similar to RVA2VA except using functions in
+// payload
+#define ADR(type, addr) (type)(get_pc() - ((ULONG_PTR) & get_pc - (ULONG_PTR)addr))
 #else
 #define ADR(type, addr) (type)(addr) // do nothing on 64-bit
 #endif
@@ -90,60 +93,60 @@ int _strcmp(const char *s1, const char *s2);
 NTSTATUS RtlUserThreadStart(LPTHREAD_START_ROUTINE lpStartAddress, LPVOID lpParameter);
 
 #if !defined(_MSC_VER)
-#define memcmp(x,y,z) Memcmp(x,y,z)
+#define memcmp(x, y, z) Memcmp(x, y, z)
 #endif
 
+#include "clr.h" // Common Language Runtime Interface
 #include "depack.h"
-#include "peb.h"           // Process Environment Block
-#include "winapi.h"        // Prototypes
-#include "clr.h"           // Common Language Runtime Interface
+#include "peb.h"    // Process Environment Block
+#include "winapi.h" // Prototypes
 
 #include "donut.h"
 
-#include "amsi.h"              // Anti-malware Scan Interface 
-#include "activescript.h"      // Interfaces for executing VBS/JS files
-#include "wscript.h"           // Interfaces to support WScript object
-#include "bypass.h"            // Structs and function definitions for needed by bypasses
+#include "activescript.h" // Interfaces for executing VBS/JS files
+#include "amsi.h"         // Anti-malware Scan Interface
+#include "bypass.h"       // Structs and function definitions for needed by bypasses
+#include "wscript.h"      // Interfaces to support WScript object
 
 typedef struct {
-    IActiveScriptSite			  site;
+    IActiveScriptSite site;
     IActiveScriptSiteWindow siteWnd;
-    IHost                   wscript;
-    PDONUT_INSTANCE         inst;      //  
+    IHost wscript;
+    PDONUT_INSTANCE inst; //
 } MyIActiveScriptSite;
 
 // internal structure
 typedef struct _DONUT_ASSEMBLY {
-    ICLRMetaHost    *icmh;
+    ICLRMetaHost *icmh;
     ICLRRuntimeInfo *icri;
     ICorRuntimeHost *icrh;
-    IUnknown        *iu;
-    AppDomain       *ad;
-    Assembly        *as;
-    Type            *type;
-    MethodInfo      *mi;
+    IUnknown *iu;
+    AppDomain *ad;
+    Assembly *as;
+    Type *type;
+    MethodInfo *mi;
 } DONUT_ASSEMBLY, *PDONUT_ASSEMBLY;
 
-    // Downloads a module from remote HTTP server into memory
-    BOOL DownloadFromHTTP(PDONUT_INSTANCE);
-    
-    // .NET DLL/EXE
-    BOOL LoadAssembly(PDONUT_INSTANCE, PDONUT_MODULE, PDONUT_ASSEMBLY);
-    BOOL RunAssembly(PDONUT_INSTANCE,  PDONUT_MODULE, PDONUT_ASSEMBLY);
-    VOID FreeAssembly(PDONUT_INSTANCE, PDONUT_ASSEMBLY);
+// Downloads a module from remote HTTP server into memory
+BOOL DownloadFromHTTP(PDONUT_INSTANCE);
 
-    // In-Memory execution of native DLL
-    VOID RunPE(PDONUT_INSTANCE, PDONUT_MODULE);
-    
-    // VBS / JS files
-    VOID RunScript(PDONUT_INSTANCE, PDONUT_MODULE);
-    
-    LPVOID xGetProcAddressByHash(PDONUT_INSTANCE, ULONGLONG, ULONGLONG);
+// .NET DLL/EXE
+BOOL LoadAssembly(PDONUT_INSTANCE, PDONUT_MODULE, PDONUT_ASSEMBLY);
+BOOL RunAssembly(PDONUT_INSTANCE, PDONUT_MODULE, PDONUT_ASSEMBLY);
+VOID FreeAssembly(PDONUT_INSTANCE, PDONUT_ASSEMBLY);
 
-    LPVOID xGetProcAddressByHash(PDONUT_INSTANCE inst, ULONG64 ulHash, ULONG64 ulIV);
+// In-Memory execution of native DLL
+VOID RunPE(PDONUT_INSTANCE, PDONUT_MODULE);
 
-    LPVOID xGetLibAddress(PDONUT_INSTANCE inst, PCHAR dll_name);
+// VBS / JS files
+VOID RunScript(PDONUT_INSTANCE, PDONUT_MODULE);
 
-    LPVOID xGetProcAddress(PDONUT_INSTANCE inst, LPVOID base, PCHAR api_name, DWORD ordinal);
+LPVOID xGetProcAddressByHash(PDONUT_INSTANCE, ULONGLONG, ULONGLONG);
+
+LPVOID xGetProcAddressByHash(PDONUT_INSTANCE inst, ULONG64 ulHash, ULONG64 ulIV);
+
+LPVOID xGetLibAddress(PDONUT_INSTANCE inst, PCHAR dll_name);
+
+LPVOID xGetProcAddress(PDONUT_INSTANCE inst, LPVOID base, PCHAR api_name, DWORD ordinal);
 
 #endif

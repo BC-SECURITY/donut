@@ -32,30 +32,28 @@
 // Function to return the program counter.
 // Always place this at the end of payload.
 // Tested with x86 build of MSVC 2019 and MinGW. YMMV.
-#if defined(_MSC_VER) 
-  #if defined(_M_IX86)
-    __declspec(naked) char *get_pc(void) {
-      __asm {
+#if defined(_MSC_VER)
+#if defined(_M_IX86)
+__declspec(naked) char *get_pc(void) {
+    __asm {
           call   pc_addr
         pc_addr:
           pop    eax
           sub    eax, 5
           ret
-      }
     }
-  #endif
-#elif defined(__GNUC__) 
-  #if defined(__i386__)
-    asm (
-      ".global get_pc\n"
-      ".global _get_pc\n"
-      "_get_pc:\n"
-      "get_pc:\n"
-      "    call    pc_addr\n"
-      "pc_addr:\n"
-      "    pop     %eax\n"
-      "    sub     $5, %eax\n"
-      "    ret\n"
-    );
-  #endif
+}
+#endif
+#elif defined(__GNUC__)
+#if defined(__i386__)
+asm(".global get_pc\n"
+    ".global _get_pc\n"
+    "_get_pc:\n"
+    "get_pc:\n"
+    "    call    pc_addr\n"
+    "pc_addr:\n"
+    "    pop     %eax\n"
+    "    sub     $5, %eax\n"
+    "    ret\n");
+#endif
 #endif

@@ -17,12 +17,10 @@ extern "C" {
 #endif
 
 #ifndef APLIB_ERROR
-# define APLIB_ERROR ((unsigned int) (-1))
+#define APLIB_ERROR ((unsigned int)(-1))
 #endif
 
-unsigned int aP_pack(const void *source,
-                     void *destination,
-                     unsigned int length,
+unsigned int aP_pack(const void *source, void *destination, unsigned int length,
                      void *workmem,
                      int (*callback)(unsigned int, unsigned int, unsigned int, void *),
                      void *cbparam);
@@ -35,27 +33,21 @@ unsigned int aP_depack_asm(const void *source, void *destination);
 
 unsigned int aP_depack_asm_fast(const void *source, void *destination);
 
-unsigned int aP_depack_asm_safe(const void *source,
-                                unsigned int srclen,
-                                void *destination,
-                                unsigned int dstlen);
+unsigned int aP_depack_asm_safe(const void *source, unsigned int srclen,
+                                void *destination, unsigned int dstlen);
 
 unsigned int aP_crc32(const void *source, unsigned int length);
 
-unsigned int aPsafe_pack(const void *source,
-                         void *destination,
-                         unsigned int length,
-                         void *workmem,
-                         int (*callback)(unsigned int, unsigned int, unsigned int, void *),
-                         void *cbparam);
+unsigned int
+aPsafe_pack(const void *source, void *destination, unsigned int length, void *workmem,
+            int (*callback)(unsigned int, unsigned int, unsigned int, void *),
+            void *cbparam);
 
 unsigned int aPsafe_check(const void *source);
 
 unsigned int aPsafe_get_orig_size(const void *source);
 
-unsigned int aPsafe_depack(const void *source,
-                           unsigned int srclen,
-                           void *destination,
+unsigned int aPsafe_depack(const void *source, unsigned int srclen, void *destination,
                            unsigned int dstlen);
 
 #ifdef __cplusplus

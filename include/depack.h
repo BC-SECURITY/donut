@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 #ifndef APLIB_ERROR
-# define APLIB_ERROR ((unsigned int) (-1))
+#define APLIB_ERROR ((unsigned int)(-1))
 #endif
 
 /* function prototype */

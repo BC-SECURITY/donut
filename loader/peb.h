@@ -37,132 +37,128 @@
 typedef void *PPS_POST_PROCESS_INIT_ROUTINE;
 
 typedef struct _LSA_UNICODE_STRING {
-  USHORT Length;
-  USHORT MaximumLength;
-  PWSTR  Buffer;
+    USHORT Length;
+    USHORT MaximumLength;
+    PWSTR Buffer;
 } LSA_UNICODE_STRING, *PLSA_UNICODE_STRING, UNICODE_STRING, *PUNICODE_STRING;
 
 typedef struct _STRING {
-  USHORT Length;
-  USHORT MaximumLength;
-  PCHAR  Buffer;
+    USHORT Length;
+    USHORT MaximumLength;
+    PCHAR Buffer;
 } STRING, *PSTRING, ANSI_STRING, *PANSI_STRING;
 
 typedef struct _RTL_USER_PROCESS_PARAMETERS {
-  BYTE           Reserved1[16];
-  PVOID          Reserved2[10];
-  UNICODE_STRING ImagePathName;
-  UNICODE_STRING CommandLine;
+    BYTE Reserved1[16];
+    PVOID Reserved2[10];
+    UNICODE_STRING ImagePathName;
+    UNICODE_STRING CommandLine;
 } RTL_USER_PROCESS_PARAMETERS, *PRTL_USER_PROCESS_PARAMETERS;
 
 // PEB defined by rewolf
 // http://blog.rewolf.pl/blog/?p=573
 typedef struct _PEB_LDR_DATA {
-  ULONG      Length;
-  BOOL       Initialized;
-  LPVOID     SsHandle;
-  LIST_ENTRY InLoadOrderModuleList;
-  LIST_ENTRY InMemoryOrderModuleList;
-  LIST_ENTRY InInitializationOrderModuleList;
+    ULONG Length;
+    BOOL Initialized;
+    LPVOID SsHandle;
+    LIST_ENTRY InLoadOrderModuleList;
+    LIST_ENTRY InMemoryOrderModuleList;
+    LIST_ENTRY InInitializationOrderModuleList;
 } PEB_LDR_DATA, *PPEB_LDR_DATA;
 
-typedef struct _LDR_DATA_TABLE_ENTRY
-{
-  LIST_ENTRY     InLoadOrderLinks;
-  LIST_ENTRY     InMemoryOrderLinks;
-  LIST_ENTRY     InInitializationOrderLinks;
-  LPVOID         DllBase;
-  LPVOID         EntryPoint;
-  ULONG          SizeOfImage;
-  UNICODE_STRING FullDllName;
-  UNICODE_STRING BaseDllName;
+typedef struct _LDR_DATA_TABLE_ENTRY {
+    LIST_ENTRY InLoadOrderLinks;
+    LIST_ENTRY InMemoryOrderLinks;
+    LIST_ENTRY InInitializationOrderLinks;
+    LPVOID DllBase;
+    LPVOID EntryPoint;
+    ULONG SizeOfImage;
+    UNICODE_STRING FullDllName;
+    UNICODE_STRING BaseDllName;
 } LDR_DATA_TABLE_ENTRY, *PLDR_DATA_TABLE_ENTRY;
 
 typedef struct _PEB {
-  BYTE                         InheritedAddressSpace;
-  BYTE                         ReadImageFileExecOptions;
-  BYTE                         BeingDebugged;
-  BYTE                         _SYSTEM_DEPENDENT_01;
+    BYTE InheritedAddressSpace;
+    BYTE ReadImageFileExecOptions;
+    BYTE BeingDebugged;
+    BYTE _SYSTEM_DEPENDENT_01;
 
-  LPVOID                       Mutant;
-  LPVOID                       ImageBaseAddress;
+    LPVOID Mutant;
+    LPVOID ImageBaseAddress;
 
-  PPEB_LDR_DATA                Ldr;
-  PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
-  LPVOID                       SubSystemData;
-  LPVOID                       ProcessHeap;
-  LPVOID                       FastPebLock;
-  LPVOID                       _SYSTEM_DEPENDENT_02;
-  LPVOID                       _SYSTEM_DEPENDENT_03;
-  LPVOID                       _SYSTEM_DEPENDENT_04;
-  union {
-    LPVOID                     KernelCallbackTable;
-    LPVOID                     UserSharedInfoPtr;
-  };  
-  DWORD                        SystemReserved;
-  DWORD                        _SYSTEM_DEPENDENT_05;
-  LPVOID                       _SYSTEM_DEPENDENT_06;
-  LPVOID                       TlsExpansionCounter;
-  LPVOID                       TlsBitmap;
-  DWORD                        TlsBitmapBits[2];
-  LPVOID                       ReadOnlySharedMemoryBase;
-  LPVOID                       _SYSTEM_DEPENDENT_07;
-  LPVOID                       ReadOnlyStaticServerData;
-  LPVOID                       AnsiCodePageData;
-  LPVOID                       OemCodePageData;
-  LPVOID                       UnicodeCaseTableData;
-  DWORD                        NumberOfProcessors;
-  union
-  {
-    DWORD                      NtGlobalFlag;
-    LPVOID                     dummy02;
-  };
-  LARGE_INTEGER                CriticalSectionTimeout;
-  LPVOID                       HeapSegmentReserve;
-  LPVOID                       HeapSegmentCommit;
-  LPVOID                       HeapDeCommitTotalFreeThreshold;
-  LPVOID                       HeapDeCommitFreeBlockThreshold;
-  DWORD                        NumberOfHeaps;
-  DWORD                        MaximumNumberOfHeaps;
-  LPVOID                       ProcessHeaps;
-  LPVOID                       GdiSharedHandleTable;
-  LPVOID                       ProcessStarterHelper;
-  LPVOID                       GdiDCAttributeList;
-  LPVOID                       LoaderLock;
-  DWORD                        OSMajorVersion;
-  DWORD                        OSMinorVersion;
-  WORD                         OSBuildNumber;
-  WORD                         OSCSDVersion;
-  DWORD                        OSPlatformId;
-  DWORD                        ImageSubsystem;
-  DWORD                        ImageSubsystemMajorVersion;
-  LPVOID                       ImageSubsystemMinorVersion;
-  union
-  {
-    LPVOID                     ImageProcessAffinityMask;
-    LPVOID                     ActiveProcessAffinityMask;
-  };
-  #ifdef _WIN64
-  LPVOID                       GdiHandleBuffer[64];
-  #else
-  LPVOID                       GdiHandleBuffer[32];
-  #endif  
-  LPVOID                       PostProcessInitRoutine;
-  LPVOID                       TlsExpansionBitmap;
-  DWORD                        TlsExpansionBitmapBits[32];
-  LPVOID                       SessionId;
-  ULARGE_INTEGER               AppCompatFlags;
-  ULARGE_INTEGER               AppCompatFlagsUser;
-  LPVOID                       pShimData;
-  LPVOID                       AppCompatInfo;
-  PUNICODE_STRING              CSDVersion;
-  LPVOID                       ActivationContextData;
-  LPVOID                       ProcessAssemblyStorageMap;
-  LPVOID                       SystemDefaultActivationContextData;
-  LPVOID                       SystemAssemblyStorageMap;
-  LPVOID                       MinimumStackCommit;  
+    PPEB_LDR_DATA Ldr;
+    PRTL_USER_PROCESS_PARAMETERS ProcessParameters;
+    LPVOID SubSystemData;
+    LPVOID ProcessHeap;
+    LPVOID FastPebLock;
+    LPVOID _SYSTEM_DEPENDENT_02;
+    LPVOID _SYSTEM_DEPENDENT_03;
+    LPVOID _SYSTEM_DEPENDENT_04;
+    union {
+        LPVOID KernelCallbackTable;
+        LPVOID UserSharedInfoPtr;
+    };
+    DWORD SystemReserved;
+    DWORD _SYSTEM_DEPENDENT_05;
+    LPVOID _SYSTEM_DEPENDENT_06;
+    LPVOID TlsExpansionCounter;
+    LPVOID TlsBitmap;
+    DWORD TlsBitmapBits[2];
+    LPVOID ReadOnlySharedMemoryBase;
+    LPVOID _SYSTEM_DEPENDENT_07;
+    LPVOID ReadOnlyStaticServerData;
+    LPVOID AnsiCodePageData;
+    LPVOID OemCodePageData;
+    LPVOID UnicodeCaseTableData;
+    DWORD NumberOfProcessors;
+    union {
+        DWORD NtGlobalFlag;
+        LPVOID dummy02;
+    };
+    LARGE_INTEGER CriticalSectionTimeout;
+    LPVOID HeapSegmentReserve;
+    LPVOID HeapSegmentCommit;
+    LPVOID HeapDeCommitTotalFreeThreshold;
+    LPVOID HeapDeCommitFreeBlockThreshold;
+    DWORD NumberOfHeaps;
+    DWORD MaximumNumberOfHeaps;
+    LPVOID ProcessHeaps;
+    LPVOID GdiSharedHandleTable;
+    LPVOID ProcessStarterHelper;
+    LPVOID GdiDCAttributeList;
+    LPVOID LoaderLock;
+    DWORD OSMajorVersion;
+    DWORD OSMinorVersion;
+    WORD OSBuildNumber;
+    WORD OSCSDVersion;
+    DWORD OSPlatformId;
+    DWORD ImageSubsystem;
+    DWORD ImageSubsystemMajorVersion;
+    LPVOID ImageSubsystemMinorVersion;
+    union {
+        LPVOID ImageProcessAffinityMask;
+        LPVOID ActiveProcessAffinityMask;
+    };
+#ifdef _WIN64
+    LPVOID GdiHandleBuffer[64];
+#else
+    LPVOID GdiHandleBuffer[32];
+#endif
+    LPVOID PostProcessInitRoutine;
+    LPVOID TlsExpansionBitmap;
+    DWORD TlsExpansionBitmapBits[32];
+    LPVOID SessionId;
+    ULARGE_INTEGER AppCompatFlags;
+    ULARGE_INTEGER AppCompatFlagsUser;
+    LPVOID pShimData;
+    LPVOID AppCompatInfo;
+    PUNICODE_STRING CSDVersion;
+    LPVOID ActivationContextData;
+    LPVOID ProcessAssemblyStorageMap;
+    LPVOID SystemDefaultActivationContextData;
+    LPVOID SystemAssemblyStorageMap;
+    LPVOID MinimumStackCommit;
 } PEB, *PPEB;
-
 
 typedef struct _CLIENT_ID {
     HANDLE UniqueProcess;
@@ -175,36 +171,32 @@ typedef struct _TEB_ACTIVE_FRAME *PTEB_ACTIVE_FRAME;
 typedef struct _TEB_ACTIVE_FRAME_CONTEXT *PTEB_ACTIVE_FRAME_CONTEXT;
 
 typedef struct _RTL_ACTIVATION_CONTEXT_STACK_FRAME {
-     PRTL_ACTIVATION_CONTEXT_STACK_FRAME Previous;
-     PACTIVATION_CONTEXT *ActivationContext;
-     ULONG Flags;
+    PRTL_ACTIVATION_CONTEXT_STACK_FRAME Previous;
+    PACTIVATION_CONTEXT *ActivationContext;
+    ULONG Flags;
 } RTL_ACTIVATION_CONTEXT_STACK_FRAME, *PRTL_ACTIVATION_CONTEXT_STACK_FRAME;
 
-typedef struct _ACTIVATION_CONTEXT_STACK
-{
-     PRTL_ACTIVATION_CONTEXT_STACK_FRAME ActiveFrame;
-     LIST_ENTRY FrameListCache;
-     ULONG Flags;
-     ULONG NextCookieSequenceNumber;
-     ULONG StackId;
+typedef struct _ACTIVATION_CONTEXT_STACK {
+    PRTL_ACTIVATION_CONTEXT_STACK_FRAME ActiveFrame;
+    LIST_ENTRY FrameListCache;
+    ULONG Flags;
+    ULONG NextCookieSequenceNumber;
+    ULONG StackId;
 } ACTIVATION_CONTEXT_STACK, *PACTIVATION_CONTEXT_STACK;
 #define GDI_BATCH_BUFFER_SIZE 310
 
-typedef struct _GDI_TEB_BATCH
-{
+typedef struct _GDI_TEB_BATCH {
     ULONG Offset;
     ULONG_PTR HDC;
     ULONG Buffer[GDI_BATCH_BUFFER_SIZE];
 } GDI_TEB_BATCH, *PGDI_TEB_BATCH;
 
-typedef struct _TEB_ACTIVE_FRAME_CONTEXT
-{
+typedef struct _TEB_ACTIVE_FRAME_CONTEXT {
     ULONG Flags;
     PSTR FrameName;
 } TEB_ACTIVE_FRAME_CONTEXT, *PTEB_ACTIVE_FRAME_CONTEXT;
 
-typedef struct _TEB_ACTIVE_FRAME
-{
+typedef struct _TEB_ACTIVE_FRAME {
     ULONG Flags;
     struct _TEB_ACTIVE_FRAME *Previous;
     PTEB_ACTIVE_FRAME_CONTEXT Context;
@@ -212,14 +204,13 @@ typedef struct _TEB_ACTIVE_FRAME
 
 #if !defined(_MSC_VER)
 typedef struct _PROCESSOR_NUMBER {
-  USHORT Group;
-  UCHAR  Number;
-  UCHAR  Reserved;
+    USHORT Group;
+    UCHAR Number;
+    UCHAR Reserved;
 } PROCESSOR_NUMBER, *PPROCESSOR_NUMBER;
 #endif
 
-typedef struct _TEB
-{
+typedef struct _TEB {
     NT_TIB NtTib;
 
     PVOID EnvironmentPointer;
@@ -289,12 +280,10 @@ typedef struct _TEB
     PVOID WinSockData;
     ULONG GdiBatchCount;
 
-    union
-    {
+    union {
         PROCESSOR_NUMBER CurrentIdealProcessor;
         ULONG IdealProcessorValue;
-        struct
-        {
+        struct {
             UCHAR ReservedPad0;
             UCHAR ReservedPad1;
             UCHAR ReservedPad2;
@@ -328,16 +317,13 @@ typedef struct _TEB
     PVOID MergedPrefLanguages;
     ULONG MuiImpersonation;
 
-    union
-    {
+    union {
         USHORT CrossTebFlags;
         USHORT SpareCrossTebBits : 16;
     };
-    union
-    {
+    union {
         USHORT SameTebFlags;
-        struct
-        {
+        struct {
             USHORT SafeThunkCall : 1;
             USHORT InDebugPrint : 1;
             USHORT HasFiberData : 1;

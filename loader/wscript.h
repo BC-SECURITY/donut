@@ -38,152 +38,86 @@ typedef struct _IHost IHost;
 
 typedef struct _IHostVtbl {
     BEGIN_INTERFACE
-    
-    HRESULT (STDMETHODCALLTYPE *QueryInterface)(
-      IHost        *This, 
-      REFIID       riid, 
-      void         **ppvObject);
 
-    ULONG (STDMETHODCALLTYPE *AddRef)(IHost *This);
+    HRESULT(STDMETHODCALLTYPE *QueryInterface)
+    (IHost *This, REFIID riid, void **ppvObject);
 
-    ULONG (STDMETHODCALLTYPE *Release)(IHost *This);
-          
-    HRESULT (STDMETHODCALLTYPE *GetTypeInfoCount)(
-      IHost        *This, 
-      UINT         *pctinfo);
+    ULONG(STDMETHODCALLTYPE *AddRef)(IHost *This);
 
-    HRESULT (STDMETHODCALLTYPE *GetTypeInfo)(
-      IHost        *This, 
-      UINT         iTInfo, 
-      LCID         lcid, 
-      ITypeInfo    **ppTInfo);
+    ULONG(STDMETHODCALLTYPE *Release)(IHost *This);
 
-    HRESULT (STDMETHODCALLTYPE *GetIDsOfNames)(
-      IHost        *This, 
-      REFIID       riid, 
-      LPOLESTR     *rgszNames,
-      UINT         cNames, 
-      LCID         lcid, 
-      DISPID       *rgDispId);
+    HRESULT(STDMETHODCALLTYPE *GetTypeInfoCount)(IHost *This, UINT *pctinfo);
 
-    HRESULT (STDMETHODCALLTYPE *Invoke)(
-      IHost        *This, 
-      DISPID       dispIdMember, 
-      REFIID       riid,
-      LCID         lcid, 
-      WORD         wFlags, 
-      DISPPARAMS   *pDispParams, 
-      VARIANT      *pVarResult,
-      EXCEPINFO    *pExcepInfo, 
-      UINT         *puArgErr);
-    
-    HRESULT (STDMETHODCALLTYPE *get_Name)(
-      IHost        *This, 
-      BSTR         *out_Name);
+    HRESULT(STDMETHODCALLTYPE *GetTypeInfo)
+    (IHost *This, UINT iTInfo, LCID lcid, ITypeInfo **ppTInfo);
 
-    HRESULT (STDMETHODCALLTYPE *get_Application)(
-      IHost        *This, 
-      IDispatch    **out_Dispatch);
+    HRESULT(STDMETHODCALLTYPE *GetIDsOfNames)
+    (IHost *This, REFIID riid, LPOLESTR *rgszNames, UINT cNames, LCID lcid,
+     DISPID *rgDispId);
 
-    HRESULT (STDMETHODCALLTYPE *get_FullName)(
-      IHost        *This, 
-      BSTR         *out_Path);
+    HRESULT(STDMETHODCALLTYPE *Invoke)
+    (IHost *This, DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags,
+     DISPPARAMS *pDispParams, VARIANT *pVarResult, EXCEPINFO *pExcepInfo, UINT *puArgErr);
 
-    HRESULT (STDMETHODCALLTYPE *get_Path)(
-      IHost        *This, 
-      BSTR         *out_Path);
+    HRESULT(STDMETHODCALLTYPE *get_Name)(IHost *This, BSTR *out_Name);
 
-    HRESULT (STDMETHODCALLTYPE *get_Interactive)(
-      IHost        *This, 
-      VARIANT_BOOL *out_Interactive);
+    HRESULT(STDMETHODCALLTYPE *get_Application)(IHost *This, IDispatch **out_Dispatch);
 
-    HRESULT (STDMETHODCALLTYPE *put_Interactive)(
-      IHost        *This, 
-      VARIANT_BOOL v);
+    HRESULT(STDMETHODCALLTYPE *get_FullName)(IHost *This, BSTR *out_Path);
 
-    HRESULT (STDMETHODCALLTYPE *Quit)(
-      IHost        *This, 
-      int          ExitCode);
+    HRESULT(STDMETHODCALLTYPE *get_Path)(IHost *This, BSTR *out_Path);
 
-    HRESULT (STDMETHODCALLTYPE *get_ScriptName)(
-      IHost        *This, 
-      BSTR         *out_ScriptName);
+    HRESULT(STDMETHODCALLTYPE *get_Interactive)
+    (IHost *This, VARIANT_BOOL *out_Interactive);
 
-    HRESULT (STDMETHODCALLTYPE *get_ScriptFullName)(
-      IHost        *This, 
-      BSTR         *out_ScriptFullName);
+    HRESULT(STDMETHODCALLTYPE *put_Interactive)(IHost *This, VARIANT_BOOL v);
 
-    HRESULT (STDMETHODCALLTYPE *get_Arguments)(
-      IHost        *This, 
-      void         **out_Arguments);
+    HRESULT(STDMETHODCALLTYPE *Quit)(IHost *This, int ExitCode);
 
-    HRESULT (STDMETHODCALLTYPE *get_Version)(
-      IHost        *This, 
-      BSTR         *out_Version);
+    HRESULT(STDMETHODCALLTYPE *get_ScriptName)(IHost *This, BSTR *out_ScriptName);
 
-    HRESULT (STDMETHODCALLTYPE *get_BuildVersion)(
-      IHost        *This, 
-      int          *out_Build);
+    HRESULT(STDMETHODCALLTYPE *get_ScriptFullName)(IHost *This, BSTR *out_ScriptFullName);
 
-    HRESULT (STDMETHODCALLTYPE *get_Timeout)(
-      IHost        *This, 
-      LONG         *out_Timeout);
+    HRESULT(STDMETHODCALLTYPE *get_Arguments)(IHost *This, void **out_Arguments);
 
-    HRESULT (STDMETHODCALLTYPE *put_Timeout)(
-      IHost        *This, 
-      LONG         v);
+    HRESULT(STDMETHODCALLTYPE *get_Version)(IHost *This, BSTR *out_Version);
 
-    HRESULT (STDMETHODCALLTYPE *CreateObject)(
-      IHost        *This, 
-      BSTR         ProgID, 
-      BSTR         Prefix, 
-      IDispatch    **out_Dispatch);
+    HRESULT(STDMETHODCALLTYPE *get_BuildVersion)(IHost *This, int *out_Build);
 
-    HRESULT (STDMETHODCALLTYPE *Echo)(
-      IHost        *This, 
-      SAFEARRAY    *args);
+    HRESULT(STDMETHODCALLTYPE *get_Timeout)(IHost *This, LONG *out_Timeout);
 
-    HRESULT (STDMETHODCALLTYPE *GetObject)(
-      IHost        *This, 
-      BSTR         Pathname, 
-      BSTR         ProgID, 
-      BSTR         Prefix, 
-      IDispatch    **out_Dispatch);
+    HRESULT(STDMETHODCALLTYPE *put_Timeout)(IHost *This, LONG v);
 
-    HRESULT (STDMETHODCALLTYPE *DisconnectObject)(
-      IHost        *This, 
-      IDispatch    *Object);
+    HRESULT(STDMETHODCALLTYPE *CreateObject)
+    (IHost *This, BSTR ProgID, BSTR Prefix, IDispatch **out_Dispatch);
 
-    HRESULT (STDMETHODCALLTYPE *Sleep)(
-      IHost        *This, 
-      LONG         Time);
+    HRESULT(STDMETHODCALLTYPE *Echo)(IHost *This, SAFEARRAY *args);
 
-    HRESULT (STDMETHODCALLTYPE *ConnectObject)(
-      IHost        *This, 
-      IDispatch    *Object, 
-      BSTR         Prefix);
+    HRESULT(STDMETHODCALLTYPE *GetObject)
+    (IHost *This, BSTR Pathname, BSTR ProgID, BSTR Prefix, IDispatch **out_Dispatch);
 
-    HRESULT (STDMETHODCALLTYPE *get_StdIn)(
-      IHost        *This, 
-      void         **ppts);
+    HRESULT(STDMETHODCALLTYPE *DisconnectObject)(IHost *This, IDispatch *Object);
 
-    HRESULT (STDMETHODCALLTYPE *get_StdOut)(
-      IHost        *This, 
-      void         **ppts);
+    HRESULT(STDMETHODCALLTYPE *Sleep)(IHost *This, LONG Time);
 
-    HRESULT (STDMETHODCALLTYPE *get_StdErr)(
-      IHost        *This, 
-      void         **ppts);
-      
+    HRESULT(STDMETHODCALLTYPE *ConnectObject)
+    (IHost *This, IDispatch *Object, BSTR Prefix);
+
+    HRESULT(STDMETHODCALLTYPE *get_StdIn)(IHost *This, void **ppts);
+
+    HRESULT(STDMETHODCALLTYPE *get_StdOut)(IHost *This, void **ppts);
+
+    HRESULT(STDMETHODCALLTYPE *get_StdErr)(IHost *This, void **ppts);
+
     END_INTERFACE
 } IHostVtbl;
 
 typedef struct _IHost {
-    IHostVtbl       *lpVtbl;     // virtual function table
-    ITypeLib        *lpTypeLib;  // type library
-    ITypeInfo       *lpTypeInfo; // type information for WScript properties/methods
-    IActiveScript   *lpEngine;   // IActiveScript engine from main thread
-    ULONG           m_cRef;      // reference count
+    IHostVtbl *lpVtbl;       // virtual function table
+    ITypeLib *lpTypeLib;     // type library
+    ITypeInfo *lpTypeInfo;   // type information for WScript properties/methods
+    IActiveScript *lpEngine; // IActiveScript engine from main thread
+    ULONG m_cRef;            // reference count
     PDONUT_INSTANCE inst;
 } IHost;
 
@@ -198,24 +132,25 @@ static STDMETHODIMP_(ULONG) Host_AddRef(IHost *This);
 // Decrements the reference count for an interface on a COM object.
 static STDMETHODIMP_(ULONG) Host_Release(IHost *This);
 
-// Retrieves the number of type information interfaces that an object provides (either 0 or 1).
+// Retrieves the number of type information interfaces that an object provides (either 0
+// or 1).
 static STDMETHODIMP Host_GetTypeInfoCount(IHost *This, UINT *pctinfo);
 
-// Retrieves the type information for an object, which can then be used to get the type information for an interface.
-static STDMETHODIMP Host_GetTypeInfo(IHost *This, UINT iTInfo, LCID lcid, ITypeInfo **ppTInfo);
+// Retrieves the type information for an object, which can then be used to get the type
+// information for an interface.
+static STDMETHODIMP Host_GetTypeInfo(IHost *This, UINT iTInfo, LCID lcid,
+                                     ITypeInfo **ppTInfo);
 
-// Maps a single member and an optional set of argument names to a corresponding set of integer DISPIDs, 
-// which can be used on subsequent calls to Invoke.
-static STDMETHODIMP Host_GetIDsOfNames(
-  IHost *This, REFIID riid, LPOLESTR *rgszNames,
-  UINT cNames, LCID lcid, DISPID *rgDispId);
+// Maps a single member and an optional set of argument names to a corresponding set of
+// integer DISPIDs, which can be used on subsequent calls to Invoke.
+static STDMETHODIMP Host_GetIDsOfNames(IHost *This, REFIID riid, LPOLESTR *rgszNames,
+                                       UINT cNames, LCID lcid, DISPID *rgDispId);
 
-// Provides access to properties and methods exposed by an object. 
+// Provides access to properties and methods exposed by an object.
 // The dispatch function DispInvoke provides a standard implementation of Invoke.
-static STDMETHODIMP Host_Invoke(
-  IHost *This, DISPID dispIdMember, REFIID riid,
-  LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pVarResult,
-  EXCEPINFO *pExcepInfo, UINT *puArgErr);
+static STDMETHODIMP Host_Invoke(IHost *This, DISPID dispIdMember, REFIID riid, LCID lcid,
+                                WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pVarResult,
+                                EXCEPINFO *pExcepInfo, UINT *puArgErr);
 
 // Returns the name of the WScript object (the host executable file).
 static STDMETHODIMP Host_get_Name(IHost *This, BSTR *out_Name);
@@ -255,13 +190,16 @@ static STDMETHODIMP Host_get_Timeout(IHost *This, LONG *out_Timeout);
 static STDMETHODIMP Host_put_Timeout(IHost *This, LONG v);
 
 // Connects the object's event sources to functions with a given prefix.
-static STDMETHODIMP Host_CreateObject(IHost *This, BSTR ProgID, BSTR Prefix, IDispatch **out_Dispatch);
+static STDMETHODIMP Host_CreateObject(IHost *This, BSTR ProgID, BSTR Prefix,
+                                      IDispatch **out_Dispatch);
 
 // Outputs text to either a message box or the command console window.
 static STDMETHODIMP Host_Echo(IHost *This, SAFEARRAY *args);
 
-// Retrieves an existing object with the specified ProgID, or creates a new one from a file.
-static STDMETHODIMP Host_GetObject(IHost *This, BSTR Pathname, BSTR ProgID, BSTR Prefix, IDispatch **out_Dispatch);
+// Retrieves an existing object with the specified ProgID, or creates a new one from a
+// file.
+static STDMETHODIMP Host_GetObject(IHost *This, BSTR Pathname, BSTR ProgID, BSTR Prefix,
+                                   IDispatch **out_Dispatch);
 
 // Disconnects a connected object's event sources.
 static STDMETHODIMP Host_DisconnectObject(IHost *This, IDispatch *Object);

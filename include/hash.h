@@ -35,20 +35,20 @@
 #include <stdint.h>
 #include <string.h>
 
-void *Memset (void *ptr, int value, unsigned int num);
+void *Memset(void *ptr, int value, unsigned int num);
 
-#define MARU_MAX_STR  64
-#define MARU_BLK_LEN  16
-#define MARU_HASH_LEN  8
-#define MARU_IV_LEN    MARU_HASH_LEN
-#define MARU_CRYPT     speck
+#define MARU_MAX_STR 64
+#define MARU_BLK_LEN 16
+#define MARU_HASH_LEN 8
+#define MARU_IV_LEN MARU_HASH_LEN
+#define MARU_CRYPT speck
 
 #ifndef ROTR32
-#define ROTR32(v,n)(((v)>>(n))|((v)<<(32-(n))))
+#define ROTR32(v, n) (((v) >> (n)) | ((v) << (32 - (n))))
 #endif
 
 #ifndef ROTL32
-#define ROTL32(v,n)(((v)<<(n))|((v)>>(32-(n))))
+#define ROTL32(v, n) (((v) << (n)) | ((v) >> (32 - (n))))
 #endif
 
 #ifdef __cplusplus

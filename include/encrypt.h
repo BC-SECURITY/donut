@@ -32,20 +32,20 @@
 #ifndef ENCRYPT_H
 #define ENCRYPT_H
 
-#include <stdint.h>
 #include <stddef.h>
+#include <stdint.h>
 #include <stdio.h>
 
 #ifndef ROTR32
-#define ROTR32(v,n)(((v)>>(n))|((v)<<(32-(n))))
+#define ROTR32(v, n) (((v) >> (n)) | ((v) << (32 - (n))))
 #endif
 
 // CHASKEY block cipher
 // 128-bit block with 128-bit key
 #define ENCRYPT chaskey
 
-#define CIPHER_BLK_LEN (128/8)
-#define CIPHER_KEY_LEN (128/8)
+#define CIPHER_BLK_LEN (128 / 8)
+#define CIPHER_KEY_LEN (128 / 8)
 
 #ifdef __cplusplus
 extern "C" {
@@ -53,7 +53,7 @@ extern "C" {
 
 void donut_encrypt(void *mk, void *ctr, void *data, uint32_t len);
 
-#define donut_decrypt(mk,ctr,data,len) donut_encrypt(mk,ctr,data,len)
+#define donut_decrypt(mk, ctr, data, len) donut_encrypt(mk, ctr, data, len)
 
 #ifdef __cplusplus
 }

