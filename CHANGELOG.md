@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Support for compiling donut executable on aarch64 platforms
+
 ### Removed
 
 - `5e34dab` - Remove support for aPLib compression
