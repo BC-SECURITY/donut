@@ -330,13 +330,6 @@ DWORD MainProc(PDONUT_INSTANCE inst) {
                 DPRINT("RtlDecompressBuffer failed with %" PRIX32, nts);
                 goto erase_memory;
             }
-        } else if (mod->compress == DONUT_COMPRESS_APLIB) {
-            DPRINT("Decompressing with aPLib");
-            aP_depack((PUCHAR)mod->data, (PUCHAR)unpck->data);
-            DPRINT("Done");
-            mod = unpck;
-        } else {
-            //
         }
     }
     DPRINT("Checking type of module");

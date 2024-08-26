@@ -117,7 +117,7 @@
   </tr>
   <tr>
     <td><code>compress</code></td>
-    <td>Indicates if the input file should be compressed. Available engines are <code>DONUT_COMPRESS_APLIB</code> to use the <a href="http://ibsensoftware.com/products_aPLib.html">aPLib</a> algorithm. For builds on Windows, the <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcompressbuffer">RtlCompressBuffer</a> API is available and supports <code>DONUT_COMPRESS_LZNT1</code>, <code>DONUT_COMPRESS_XPRESS</code> and <code>DONUT_COMPRESS_XPRESS_HUFF</code>.</td>
+    <td>Indicates if the input file should be compressed. Available engines are <code>DONUT_COMPRESS_LZNT1</code>, <code>DONUT_COMPRESS_XPRESS</code> and <code>DONUT_COMPRESS_XPRESS_HUFF</code>. This uses the <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcompressbuffer">RtlCompressBuffer</a> API is available and is only supported on Windows builds.</td>
   </tr>
   <tr>
     <td><code>entropy</code></td>
@@ -423,10 +423,6 @@
   <tr>
     <td>loader/wscript.c</td>
     <td>Supports a number of WScript methods that cscript/wscript support.</td>
-  </tr>
-  <tr>
-    <td>loader/depack.c</td>
-    <td>Supports unpacking of modules compressed with aPLib.</td>
   </tr>
   <tr>
     <td>loader/bypass.c</td>

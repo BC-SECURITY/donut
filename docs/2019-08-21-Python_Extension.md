@@ -81,7 +81,7 @@ The following table lists key words for the create method.
   <tr>
     <td>compress</td>
     <td>Integer</td>
-    <td>Indicates if the input file should be compressed. Available engines are 1=<code>DONUT_COMPRESS_NONE</code>, 2=<code>DONUT_COMPRESS_APLIB</code> to use the <a href="http://ibsensoftware.com/products_aPLib.html">aPLib</a> algorithm. For builds on Windows, the <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcompressbuffer">RtlCompressBuffer</a> API is available and supports 3=<code>DONUT_COMPRESS_LZNT1</code>, 4=<code>DONUT_COMPRESS_XPRESS</code> and 5=<code>DONUT_COMPRESS_XPRESS_HUFF</code>.</td>
+    <td>Indicates if the input file should be compressed. Available engines are 1=<code>DONUT_COMPRESS_NONE</code>, 2=<code>DONUT_COMPRESS_LZNT1</code>, 3=<code>DONUT_COMPRESS_XPRESS</code> and 4=<code>DONUT_COMPRESS_XPRESS_HUFF</code>. This option uses the <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcompressbuffer">RtlCompressBuffer</a> API for compression and is only available on Windows builds.</td>
   </tr>
   <tr>
     <td>entropy</td>

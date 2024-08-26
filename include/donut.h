@@ -81,7 +81,6 @@
 
 #endif
 
-#include "aplib.h"   // aPLib compression for both windows + linux
 #include "encrypt.h" // symmetric encryption of instance+module
 #include "format.h"  // output format for loader
 #include "hash.h"    // api hashing
@@ -162,9 +161,8 @@ typedef struct _GUID {
 
 // compression engine
 #define DONUT_COMPRESS_NONE 1
-#define DONUT_COMPRESS_APLIB 2
-#define DONUT_COMPRESS_LZNT1 3  // COMPRESSION_FORMAT_LZNT1
-#define DONUT_COMPRESS_XPRESS 4 // COMPRESSION_FORMAT_XPRESS
+#define DONUT_COMPRESS_LZNT1 2  // COMPRESSION_FORMAT_LZNT1
+#define DONUT_COMPRESS_XPRESS 3 // COMPRESSION_FORMAT_XPRESS
 
 // entropy level
 #define DONUT_ENTROPY_NONE 1    // don't use any entropy

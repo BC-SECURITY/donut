@@ -32,8 +32,6 @@
 #ifndef BYPASS_H
 #define BYPASS_H
 
-// #include <ntstatus.h>
-
 // Disables Antimalware Scan Interface
 BOOL DisableAMSI(PDONUT_INSTANCE);
 
