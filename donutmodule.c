@@ -219,8 +219,8 @@ static PyObject *Donut_Create(PyObject *self, PyObject *args, PyObject *keywds) 
 // module's function table
 static PyMethodDef Donut_FunctionsTable[] = {
     {
-        "create",     // name exposed to Python
-        Donut_Create, // C wrapper function
+        "create",                                  // name exposed to Python
+        (PyCFunction)(void (*)(void))Donut_Create, // C wrapper function
         METH_VARARGS | METH_KEYWORDS,
         "Calls DonutCreate to generate shellcode for a .NET assembly" // documentation
     },
