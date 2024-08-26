@@ -3,7 +3,7 @@ CC64 := x86_64-w64-mingw32-gcc
 
 donut: clean
 	$(info ###### RELEASE ######)
-	gcc -I include loader/exe2h/exe2h.c -oexe2h
+	$(CC) -I include loader/exe2h/exe2h.c -oexe2h
 	$(CC64) -I include loader/exe2h/exe2h.c loader/exe2h/mmap-windows.c -lshlwapi -oexe2h.exe
 
 	$(CC32) -DBYPASS_AMSI_B -DBYPASS_WLDP_A -DBYPASS_ETW_B -fno-toplevel-reorder -fpack-struct=8 -fPIC -O0 -nostdlib loader/loader.c loader/clib.c hash.c encrypt.c -I include -oloader.exe
@@ -23,5 +23,5 @@ debug: clean
 	$(CC32) -Wall loader/inject_local.c -oinject_local32.exe
 	$(CC64) -Wall loader/inject_local.c -oinject_local64.exe
 clean:
-	rm -f exe2h exe2h.exe loader.bin instance donut.o hash.o encrypt.o format.o clib.o hash encrypt donut hash.exe encrypt.exe donut.exe lib/libdonut.a lib/libdonut.so loader.exe loader32.exe loader64.exe inject32.exe inject64.exe inject_local32.exe inject_local64.exe
+	$(RM) exe2h exe2h.exe loader.bin instance donut.o hash.o encrypt.o format.o clib.o hash encrypt donut hash.exe encrypt.exe donut.exe lib/libdonut.a lib/libdonut.so loader.exe loader32.exe loader64.exe inject32.exe inject64.exe inject_local32.exe inject_local64.exe
 
