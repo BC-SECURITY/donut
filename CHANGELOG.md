@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Removed
+
+- `5e34dab` - Remove support for aPLib compression
+
 ## [1.0.0] - 2023-03-03
 
 ### Added
@@ -54,5 +60,6 @@ All notable changes to this project will be documented in this file.
 * XSL files are no longer supported.
 * Code stub for calling DLL function with multiple arguments.
 
-[1.0.0]: https://github.com/MEhrn00/donut/compare/v0.9.3...v1.0.0
+[unreleased]: https://github.com/MEhrn00/donut/compare/v1.0...HEAD
+[1.0.0]: https://github.com/MEhrn00/donut/compare/v0.9.3...v1.0
 [0.9.3]: https://github.com/MEhrn00/donut/releases/tag/v0.9.3
