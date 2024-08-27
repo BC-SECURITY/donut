@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.0.0] - 2024-08-26
 
 ### Added
 
@@ -64,6 +64,6 @@ All notable changes to this project will be documented in this file.
 * XSL files are no longer supported.
 * Code stub for calling DLL function with multiple arguments.
 
-[unreleased]: https://github.com/MEhrn00/donut/compare/v1.0...HEAD
+[2.0.0]: https://github.com/MEhrn00/donut/compare/v1.0...v2.0.0
 [1.0.0]: https://github.com/MEhrn00/donut/compare/v0.9.3...v1.0
 [0.9.3]: https://github.com/MEhrn00/donut/releases/tag/v0.9.3
