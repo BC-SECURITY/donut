@@ -425,22 +425,7 @@ int compress_file(PDONUT_CONFIG c) {
       } else err = DONUT_ERROR_COMPRESSION;
     }
     #endif
-    if(c->compress == DONUT_COMPRESS_APLIB) {
-      DPRINT("Obtaining size of compressed data from aP_max_packed_size() and allocating memory");
-      fi.zdata = malloc(aP_max_packed_size(fi.len));
-      if(fi.zdata != NULL) {
-        DPRINT("Obtaining size of work memory from aP_workmem_size() and allocating memory");
-        uint8_t *workmem = malloc(aP_workmem_size(fi.len));
-        if(workmem != NULL) {
-          DPRINT("Compressing with aP_pack()");
-          fi.zlen = aP_pack(fi.data, fi.zdata, fi.len, workmem, NULL, NULL);
-        
-          if(fi.zlen == APLIB_ERROR) err = DONUT_ERROR_COMPRESSION;
-          free(workmem);
-        } else err = DONUT_ERROR_NO_MEMORY;
-      } else err = DONUT_ERROR_NO_MEMORY;
-    }
-    
+
     // if compression is specified
     if(err == DONUT_ERROR_OK && c->compress != DONUT_COMPRESS_NONE) {
       // set the compressed length in configuration
@@ -1365,7 +1350,6 @@ static int validate_loader_cfg(PDONUT_CONFIG c) {
     
     #ifdef WINDOWS
       if(c->compress != DONUT_COMPRESS_NONE  &&
-         c->compress != DONUT_COMPRESS_APLIB &&
          c->compress != DONUT_COMPRESS_LZNT1 &&
          c->compress != DONUT_COMPRESS_XPRESS)
       {
@@ -1373,8 +1357,7 @@ static int validate_loader_cfg(PDONUT_CONFIG c) {
         return DONUT_ERROR_INVALID_ENGINE;
       }
     #else
-      if(c->compress != DONUT_COMPRESS_NONE        &&
-         c->compress != DONUT_COMPRESS_APLIB)
+      if(c->compress != DONUT_COMPRESS_NONE)
       {
         DPRINT("Compression engine %" PRId32 " is invalid.", c->compress);
         return DONUT_ERROR_INVALID_ENGINE;
@@ -2160,9 +2143,9 @@ static void usage (void) {
     
     printf("                   -EXTRA-\n\n"); 
 #ifdef WINDOWS
-    printf("       -z,--compress: <engine>                 Pack/Compress file. 1=None, 2=aPLib, 3=LZNT1, 4=Xpress.\n");
+    printf("       -z,--compress: <engine>                 Pack/Compress file. 1=None, 3=LZNT1, 4=Xpress\n");
 #else
-    printf("       -z,--compress: <engine>                 Pack/Compress file. 1=None, 2=aPLib\n");
+    printf("       -z,--compress: <engine>                 Pack/Compress file. 1=None\n");
 #endif
     printf("       -b,--bypass: <level>                    Bypass AMSI/WLDP/ETW : 1=None, 2=Abort on fail, 3=Continue on fail.(default)\n\n");
     printf("       -k,--headers: <level>                   Preserve PE headers. 1=Overwrite (default), 2=Keep all\n\n");
@@ -2274,7 +2257,6 @@ int main(int argc, char *argv[]) {
     
     if(c.compress != DONUT_COMPRESS_NONE) {
       printf("  [ Compressed    : %s (Reduced by %"PRId32"%%)\n",
-        c.compress == DONUT_COMPRESS_APLIB  ? "aPLib" :
         c.compress == DONUT_COMPRESS_LZNT1  ? "LZNT1" : "Xpress",
         file_diff(c.zlen, c.len));
     }
