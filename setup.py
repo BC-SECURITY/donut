@@ -4,7 +4,7 @@ import sys
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-static_libraries   = ['aplib64']
+static_libraries   = []
 static_lib_dir     = 'lib'
 libraries          = []
 library_dirs       = ['lib']
@@ -44,7 +44,7 @@ module = Extension(
 
 setup(
      name='donut-shellcode',
-     version='1.0.2',
+     version='1.2.0',
      description='Donut shellcode Python C extension',
      long_description=long_description,
      long_description_content_type="text/markdown",
